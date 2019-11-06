@@ -34,21 +34,18 @@ if __name__ == '__main__':
             unit_length = pose_detector.get_unit_length(person_pose)
 
             # hands estimation
-            print("Estimating hands keypoints...")
             hands = pose_detector.crop_hands(img, person_pose, unit_length)
             if hands["left"] is not None:
                 hand_img = hands["left"]["img"]
                 bbox = hands["left"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="left")
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
-                cv2.rectangle(res_img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 255, 255), 1)
 
             if hands["right"] is not None:
                 hand_img = hands["right"]["img"]
                 bbox = hands["right"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="right")
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
-                cv2.rectangle(res_img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 255, 255), 1)
 
         cv2.imshow("result", res_img)
         cv2.waitKey(1)

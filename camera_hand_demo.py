@@ -1,7 +1,6 @@
 import cv2
 import argparse
 import chainer
-from entity import paramsd
 from pose_detector import PoseDetector, draw_person_pose
 from face_detector import FaceDetector, draw_face_keypoints
 from hand_detector import HandDetector, draw_hand_keypoints
@@ -15,8 +14,8 @@ if __name__ == '__main__':
 
     # load model
     face_detector = FaceDetector("facenet", "models/facenet.npz", device=args.gpu)
-    hand_detector = HandDetector("handnet", "models/handnet.npz", devide=args.gpu)
-    pose_detector = PoseDetector("posenet", "models/coco_posenet.npz", devide=args.gpu)
+    hand_detector = HandDetector("handnet", "models/handnet.npz", device=args.gpu)
+    pose_detector = PoseDetector("posenet", "models/coco_posenet.npz", device=args.gpu)
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)

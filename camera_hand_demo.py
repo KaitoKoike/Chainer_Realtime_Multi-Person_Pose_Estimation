@@ -12,12 +12,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='hand detector')
     parser.add_argument('--gpu', '-g', type=int, default=-1, help='GPU ID (negative value indicates CPU)')
     parser.add_argument("--precise", "-p", type=str, default=False, help="pose detector mode (precise or not)")
+    parser.add_argument("--cameraId", "-c", type=int, default=0,help="select an id of camera you will use")
     args = parser.parse_args()
 
     # load model
     hand_detector = HandDetector("handnet", "models/handnet.npz", device=args.gpu)
     pose_detector = PoseDetector("posenet", "models/coco_posenet.npz", device=args.gpu, precise=args.precise)
-    cap = cv2.VideoCapture(4)
+    cap = cv2.VideoCapture(args.cameraId)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 

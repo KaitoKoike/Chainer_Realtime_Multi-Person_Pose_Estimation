@@ -3,8 +3,10 @@ import argparse
 import chainer
 from pose_detector import PoseDetector, draw_person_pose
 from hand_detector import HandDetector, draw_hand_keypoints
-
+import cupy as cp
 chainer.using_config('enable_backprop', False)
+pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
+cp.cuda.set_allocator(pool.malloc)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='hand detector')

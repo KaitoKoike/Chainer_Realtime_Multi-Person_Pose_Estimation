@@ -52,6 +52,9 @@ if __name__ == '__main__':
                 res_img = hand_detector.draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
         cv2.imshow("result", res_img)
-        result_file_name = "result_hand"+time.time()+".png"
-        cv2.imWrite(result_file_name, res_img)
+        result_file_path_name = "result_images/result_hand"+time.time()+".png"
+        ret = cv2.imWrite(result_file_path_name, res_img)
+        if not ret:
+            print("fail to save this image")
+            break
         cv2.waitKey(1)

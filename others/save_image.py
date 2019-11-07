@@ -1,5 +1,7 @@
-from .. import pose_detector
-from .. import hand_detector
+import sys
+sys.path.append("../")
+import pose_detector
+import hand_detector
 import cv2
 import argparse
 import chainer

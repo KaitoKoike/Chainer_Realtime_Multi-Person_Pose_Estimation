@@ -54,7 +54,7 @@ if __name__ == '__main__':
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
         cv2.imshow("result", res_img)
-        result_file_path_name = "result_images/result_hand"+time.time()+".png"
+        result_file_path_name = "result_images/result_hand"+str(time.time())+".png"
         ret = cv2.imWrite(result_file_path_name, res_img)
         if not ret:
             print("fail to save this image")

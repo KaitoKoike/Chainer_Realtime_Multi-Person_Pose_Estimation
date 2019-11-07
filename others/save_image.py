@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
         cv2.imshow("result", res_img)
         result_file_path_name = "result_images/result_hand"+str(time.time())+".png"
-        ret = cv2.imWrite(result_file_path_name, res_img)
+        ret = cv2.imwrite(result_file_path_name, res_img)
         if not ret:
             print("fail to save this image")
             break

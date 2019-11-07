@@ -35,7 +35,7 @@ if __name__ == '__main__':
             break
 
         person_pose_array, _ = pose_detector(img)
-        res_img = cv2.addWeighted(img, 0.6, pose_detector.draw_person_pose(img, person_pose_array), 0.4, 0)
+        res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)
         for person_pose in person_pose_array:
             unit_length = pose_detector.get_unit_length(person_pose)
 

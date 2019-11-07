@@ -20,8 +20,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # load model
-    hand_detector = hand_detector.HandDetector("handnet", "../models/handnet.npz", device=args.gpu)
-    pose_detector = pose_detector.PoseDetector("posenet", "../models/coco_posenet.npz", device=args.gpu, precise=args.precise)
+    hand_detector = HandDetector("handnet", "../models/handnet.npz", device=args.gpu)
+    pose_detector = PoseDetector("posenet", "../models/coco_posenet.npz", device=args.gpu, precise=args.precise)
     cap = cv2.VideoCapture(args.cameraId)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -45,13 +45,13 @@ if __name__ == '__main__':
                 hand_img = hands["left"]["img"]
                 bbox = hands["left"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="left")
-                res_img = hand_detector.draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
+                res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
             if hands["right"] is not None:
                 hand_img = hands["right"]["img"]
                 bbox = hands["right"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="right")
-                res_img = hand_detector.draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
+                res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
         cv2.imshow("result", res_img)
         result_file_path_name = "result_images/result_hand"+time.time()+".png"

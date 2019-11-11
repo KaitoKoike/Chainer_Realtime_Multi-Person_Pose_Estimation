@@ -7,6 +7,8 @@ import argparse
 import chainer
 import cupy as cp
 import time
+import json
+
 chainer.using_config('enable_backprop', False)
 pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
 cp.cuda.set_allocator(pool.malloc)
@@ -36,11 +38,13 @@ if __name__ == '__main__':
 
         person_pose_array, _ = pose_detector(img)
         res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)
-        for person_pose in person_pose_array:
+        hands_result = {"result":[]}
+        for i, person_pose in enumerate(person_pose_array):
             unit_length = pose_detector.get_unit_length(person_pose)
 
             # hands estimation
             hands = pose_detector.crop_hands(img, person_pose, unit_length)
+            hands_result["result"].append(hands)
             if hands["left"] is not None:
                 hand_img = hands["left"]["img"]
                 bbox = hands["left"]["bbox"]
@@ -53,8 +57,12 @@ if __name__ == '__main__':
                 hand_keypoints = hand_detector(hand_img, hand_type="right")
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
+        now_time = time.time()
         cv2.imshow("result", res_img)
-        result_file_path_name = "result_images/result_hand"+str(time.time())+".png"
+        result_file_path_name = "result_images/result_hand"+str(now_time)+".png"
+        hands_position_file_path = "result_hand_position/result_hand_pos"+str(now_time)+".json"
+        hands_file = open(hands_position_file_path, "w")
+        json.dump(hands_result, hands_file)
         ret = cv2.imwrite(result_file_path_name, res_img)
         if not ret:
             print("fail to save this image")

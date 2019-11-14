@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
         person_pose_array, _ = pose_detector(img)
         res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)
-        hands_result = {"result":[]}
+        hands_result = {"result": []}
         for i, person_pose in enumerate(person_pose_array):
             unit_length = pose_detector.get_unit_length(person_pose)
 

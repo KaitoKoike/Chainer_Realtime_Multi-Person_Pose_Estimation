@@ -59,7 +59,9 @@ if __name__ == '__main__':
                 bbox = hands["left"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="left")
                 if hand_keypoints:
-                    person_hand["left"] = [list(map(float, keypoint)) for keypoint in hand_keypoints]
+                    person_hand["left"] = [list(map(float, keypoint)) if keypoint else
+                                           None
+                                           for keypoint in hand_keypoints]
 
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
@@ -68,7 +70,9 @@ if __name__ == '__main__':
                 bbox = hands["right"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="right")
                 if hand_keypoints:
-                    person_hand["right"] = [list(map(float, keypoint)) for keypoint in hand_keypoints]
+                    person_hand["right"] = [list(map(float, keypoint)) if keypoint else
+                                            None
+                                            for keypoint in hand_keypoints]
 
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 

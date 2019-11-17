@@ -58,14 +58,14 @@ if __name__ == '__main__':
                 hand_img = hands["left"]["img"]
                 bbox = hands["left"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="left")
-                person_hand["left"] = list(hand_keypoints)
+                person_hand["left"] = list(hand_keypoints.astype("float"))
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
             if hands["right"] is not None:
                 hand_img = hands["right"]["img"]
                 bbox = hands["right"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="right")
-                person_hand["right"] = list(hand_keypoints)
+                person_hand["right"] = list(hand_keypoints.astype("float"))
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
             hands_result["result"].append(person_hand)

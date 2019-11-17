@@ -48,6 +48,7 @@ if __name__ == '__main__':
         res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)
         hands_result = {"result": []}
         for i, person_pose in enumerate(person_pose_array):
+            person_hand = {"right": None, "left": None}
             unit_length = pose_detector.get_unit_length(person_pose)
 
             # hands estimation
@@ -57,14 +58,17 @@ if __name__ == '__main__':
                 hand_img = hands["left"]["img"]
                 bbox = hands["left"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="left")
+                person_hand["left"] = hand_keypoints
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
             if hands["right"] is not None:
                 hand_img = hands["right"]["img"]
                 bbox = hands["right"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="right")
+                person_hand["right"] = hand_keypoints
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
-        print(hands_result)
+
+            hands_result["result"].append(person_hand)
 
         now_time = time.time()
         cv2.imshow("result", res_img)

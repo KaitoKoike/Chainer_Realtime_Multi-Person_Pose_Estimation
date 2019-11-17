@@ -5,13 +5,13 @@ from hand_detector import HandDetector, draw_hand_keypoints
 import cv2
 import argparse
 import chainer
-import cupy as cp
+# import cupy as cp
 import time
 import json
 
-chainer.using_config('enable_backprop', False)
-pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
-cp.cuda.set_allocator(pool.malloc)
+#chainer.using_config('enable_backprop', False)
+#pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
+#cp.cuda.set_allocator(pool.malloc)
 
 
 if __name__ == '__main__':
@@ -58,14 +58,18 @@ if __name__ == '__main__':
                 hand_img = hands["left"]["img"]
                 bbox = hands["left"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="left")
-                person_hand["left"] = list(hand_keypoints.astype("float"))
+                if hand_keypoints:
+                    person_hand["left"] = [list(map(float, keypoint)) for keypoint in hand_keypoints]
+
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
             if hands["right"] is not None:
                 hand_img = hands["right"]["img"]
                 bbox = hands["right"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="right")
-                person_hand["right"] = list(hand_keypoints.astype("float"))
+                if hand_keypoints:
+                    person_hand["right"] = [list(map(float, keypoint)) for keypoint in hand_keypoints]
+
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
             hands_result["result"].append(person_hand)

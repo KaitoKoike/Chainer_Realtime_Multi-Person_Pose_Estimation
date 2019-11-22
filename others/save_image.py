@@ -5,44 +5,45 @@ from hand_detector import HandDetector, draw_hand_keypoints
 import cv2
 import argparse
 import chainer
-import cupy as cp
-import time
+#import cupy as cp
 import json
+import os
+import glob
 
-chainer.using_config('enable_backprop', False)
-pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
-cp.cuda.set_allocator(pool.malloc)
 
+#chainer.using_config('enable_backprop', False)
+#pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
+#cp.cuda.set_allocator(pool.malloc)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='hand detector')
     parser.add_argument('--gpu', '-g', type=int, default=-1, help='GPU ID (negative value indicates CPU)')
     parser.add_argument("--precise", "-p", type=str, default=False, help="pose detector mode (precise or not)")
-    parser.add_argument("--video_path", "-vp", type=str, default=None, help="video path to make a data")
+    parser.add_argument("--img_dir", "-id", type=str, default=None, help="image directory to make a data")
     args = parser.parse_args()
 
     # load model
     hand_detector = HandDetector("handnet", "../models/handnet.npz", device=args.gpu)
     pose_detector = PoseDetector("posenet", "../models/coco_posenet.npz", device=args.gpu, precise=args.precise)
 
-    # ビデオをキャプチャーして解析し，保存する
-    cap = cv2.VideoCapture(args.video_path)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-
-    if not cap.isOpened():
-        sys.exit()
+    # train data set用の場所
     train_file = open("train.csv", "a")
     train_file.write("hand_position,right_hand,left_hand")
 
-    while True:
+    # フォルダがなければ作成する
+    if not os.path.exists("result_handimg"):
+        os.mkdir("result_handing")
+    if not os.path.exists("hand_position_dataset"):
+        os.mkdir("hand_position_dataset")
+    if not os.path.exists("hand_img"):
+        os.mkdir("hand_img")
 
+    for image_path in glob.glob(args.img_dir+"*"):
+        print(image_path)
         # get video frame
-        ret, img = cap.read()
-
-        if not ret:
-            print("Failed to capture image")
-            break
+        img = cv2.imread(image_path)
+        if "hidari" in image_path:
+            img = cv2.flip(img, 1)
 
         person_pose_array, _ = pose_detector(img)
         res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)
@@ -54,8 +55,12 @@ if __name__ == '__main__':
 
             # hands estimation
             hands = pose_detector.crop_hands(img, person_pose, unit_length)
-            if hands["left"] is not None:
+
+            if hands["left"]:
                 hand_img = hands["left"]["img"]
+                hand_file_name = image_path.split("/")[-1].replace(".png", "_lefthand.png")
+                cv2.imwrite("hand_img/"+hand_file_name, hand_img)
+
                 bbox = hands["left"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="left")
                 if hand_keypoints:
@@ -65,8 +70,10 @@ if __name__ == '__main__':
 
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
-            if hands["right"] is not None:
+            if hands["right"]:
                 hand_img = hands["right"]["img"]
+                hand_file_name = image_path.split("/")[-1].replace(".png", "_righthand.png")
+                cv2.imwrite("hand_img/" + hand_file_name, hand_img)
                 bbox = hands["right"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="right")
                 if hand_keypoints:
@@ -77,26 +84,27 @@ if __name__ == '__main__':
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
 
             hands_result["result"].append(person_hand)
-        print(hands_result)
-        now_time = time.time()
 
-        result_file_path_name = "result_images/result_hand"+str(now_time)+".png"
-        hands_position_file_path = "result_hand_position/result_hand_pos"+str(now_time)+".json"
+        # res_imgの保存
+        result_img_path = image_path.split("/")[-1].replace(".png", "result.png")
+        cv2.imwrite("result_handimg/"+result_img_path, res_img)
+
+        # hand positionの保存
+        hands_position_file_path = "hand_position_dataset/"+image_path.split("/")[-1].replace(".png", ".json")
         hands_file = open(hands_position_file_path, "w")
         json.dump(hands_result, hands_file)
 
         cv2.imshow("result_image", res_img)
-        print("これは意見なら1，質問なら2，それ以外なら0を記入")
-        print("右")
-        train_right = input()
-        print("左")
-        train_left = input()
-        train_line = "\n"+hands_position_file_path+","+train_right+","+train_left
+
+        # 意見の時1，質問の時2, それ以外0
+        if "1finger" in image_path:
+            ob = 1
+        elif "5finger" in image_path:
+            ob = 2
+        else:
+            ob = 0
+
+        train_line = "\n"+hands_position_file_path+","+str(ob)
         train_file.write(train_line)
 
-        ret = cv2.imwrite(result_file_path_name, res_img)
-
-        if not ret:
-            print("fail to save this image")
-            break
         cv2.waitKey(1)

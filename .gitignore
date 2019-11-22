@@ -10,7 +10,8 @@ result.png
 *.chainermodel
 *.npz
 *.png
-/others/result_hand_position/*
-/others/result_images/*
+/others/result_handimg/*
+/others/hand_position_dataset/*
+/others/hand_img/*
 /others/*.csv
 /others/*.mov

@@ -379,7 +379,7 @@ class PoseDetector(object):
             if person_pose[JointType.LeftElbow][2] > 0:
                 direction_vec = person_pose[JointType.LeftHand][:-1] - person_pose[JointType.LeftElbow][:-1]
                 crop_center += (0.3 * direction_vec).astype(crop_center.dtype)
-            hand_img, bbox = self.crop_hands(img, crop_center, unit_length * 0.95)
+            hand_img, bbox = self.crop_around_keypoint(img, crop_center, unit_length * 0.95)
             hands["left"] = {
                 "img": hand_img,
                 "bbox": bbox

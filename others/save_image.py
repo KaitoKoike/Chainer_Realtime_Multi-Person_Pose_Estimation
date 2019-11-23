@@ -5,15 +5,15 @@ from hand_detector import HandDetector, draw_hand_keypoints
 import cv2
 import argparse
 import chainer
-#import cupy as cp
+import cupy as cp
 import json
 import os
 import glob
 
 
-#chainer.using_config('enable_backprop', False)
-#pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
-#cp.cuda.set_allocator(pool.malloc)
+chainer.using_config('enable_backprop', False)
+pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
+cp.cuda.set_allocator(pool.malloc)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='hand detector')
@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     # フォルダがなければ作成する
     if not os.path.exists("result_handimg"):
-        os.mkdir("result_handing")
+        os.mkdir("result_handimg")
     if not os.path.exists("hand_position_dataset"):
         os.mkdir("hand_position_dataset")
     if not os.path.exists("hand_img"):

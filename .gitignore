@@ -10,6 +10,7 @@ result.png
 *.chainermodel
 *.npz
 *.png
+*.tar.gz
 /others/result_handimg/*
 /others/hand_position_dataset/*
 /others/hand_img/*

@@ -11,6 +11,7 @@ class GestureRecognizer(object):
 
     def __call__(self, hand_keypoint):
         hand_keypoint = self.preprocessing(hand_keypoint)
+        print(hand_keypoint)
         gesture = self.model.predict([hand_keypoint])
         print(gesture)
         return gesture
@@ -40,5 +41,5 @@ def draw_gesture(img,gesture,left_top):
         action = "opinion"
     elif gesture == "2":
         action = "question"
-    cv2.putText(img, action, (left,top), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), lineType=cv2.LINE_AA)
+    cv2.putText(img, action, (300, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), lineType=cv2.LINE_AA)
     return img

@@ -47,16 +47,16 @@ if __name__ == '__main__':
                 bbox = hands["left"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="left")
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
-                hand_gesture_right = gesture_recognizer(hand_keypoints)
-                res_img = draw_gesture(res_img,hand_gesture_right,(bbox[0],bbox[1]))
+                hand_gesture_left = gesture_recognizer(hand_keypoints)
+                res_img = draw_gesture(res_img,hand_gesture_left,(bbox[0],bbox[1]))
 
             if hands["right"] is not None:
                 hand_img = hands["right"]["img"]
                 bbox = hands["right"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="right")
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
-                hand_gesture_left = gesture_recognizer(hand_keypoints)
-                res_img = draw_gesture(res_img, hand_gesture_left, (bbox[0], bbox[1]))
+                hand_gesture_right = gesture_recognizer(hand_keypoints)
+                res_img = draw_gesture(res_img, hand_gesture_right, (bbox[0], bbox[1]))
 
 
         cv2.imshow("result", res_img)

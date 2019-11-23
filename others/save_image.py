@@ -50,7 +50,7 @@ if __name__ == '__main__':
         hands_result = {"result": []}
         for i, person_pose in enumerate(person_pose_array):
             print(i, "人目")
-            person_hand = {"right": None, "left": None}
+            person_hand = {"right": None, "left": None, "unit_length": unit_length}
             unit_length = pose_detector.get_unit_length(person_pose)
 
             # hands estimation

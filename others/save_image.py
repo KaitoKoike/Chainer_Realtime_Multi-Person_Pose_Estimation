@@ -20,6 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('--gpu', '-g', type=int, default=-1, help='GPU ID (negative value indicates CPU)')
     parser.add_argument("--precise", "-p", type=str, default=False, help="pose detector mode (precise or not)")
     parser.add_argument("--img_dir", "-id", type=str, default=None, help="image directory to make a data")
+    parser.add_argument("--handtype, ""ht", type=str, default="migi", help="hand side of you want to recognize")
     args = parser.parse_args()
 
     # load model
@@ -29,6 +30,9 @@ if __name__ == '__main__':
     # train data set用の場所
     train_file = open("train.csv", "a")
     train_file.write("hand_position,right_hand,left_hand")
+
+    # 認識する手
+    hand_type = args.handtype
 
     # フォルダがなければ作成する
     if not os.path.exists("result_handimg"):
@@ -42,8 +46,10 @@ if __name__ == '__main__':
         print(image_path)
         # get video frame
         img = cv2.imread(image_path)
-        if "hidari" in image_path:
+        if hand_type == "migi" and "hidari" in image_path:
             img = cv2.flip(img, 1)
+        elif hand_type == "hidari" and "migi" in image_path:
+            img = cv2.flip(img,1)
 
         person_pose_array, _ = pose_detector(img)
         res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)

@@ -9,12 +9,16 @@ class GestureRecognizer(object):
         print(model_path)
         self.model = pickle.load(open(model_path, "rb"))
 
-    def __call__(self, hand_keypoint):
-        hand_keypoint = self.preprocessing(hand_keypoint)
-        print(hand_keypoint)
-        gesture = self.model.predict([hand_keypoint])
-        print(gesture)
-        return gesture
+    def __call__(self, hand_keypoint, unit_length):
+        if hand_keypoint[0] is not None:
+            hand_keypoint = self.preprocessing_two(hand_keypoint, unit_length)
+            print(hand_keypoint)
+            gesture = self.model.predict([hand_keypoint])
+            print(gesture)
+            return gesture
+        else:
+            print("手が変")
+            return ["0"]
 
     def preprocessing(self, hand_key_point):
         none_indexes = [i for i, hand_position in enumerate(hand_key_point) if hand_position is None]
@@ -31,6 +35,18 @@ class GestureRecognizer(object):
 
         return np.array(keypoint_from_base).ravel()
 
+    def preprocessing_two(self,hand_key_point, unit_length):
+        none_indexes = [i for i, hand_position in enumerate(hand_key_point) if hand_position is None]
+        for idx in none_indexes:
+            hand_key_point[idx] = [hand_key_point[0][0], hand_key_point[0][1], 0.0]
+        base_keypoint = hand_key_point[0]
+        each_vector = []
+        for i, position_from in enumerate(hand_key_point):
+            for j, position_to in enumerate(hand_key_point):
+                if i != j:
+                    each_vector.append([(position_to[0] - position_from[0]) / unit_length,
+                                        (position_to[1] - position_from[1]) / unit_length])
+        return np.array(each_vector).ravel()
 
 def draw_gesture(img,gesture,left_top):
     left, top = left_top
@@ -41,5 +57,5 @@ def draw_gesture(img,gesture,left_top):
         action = "opinion"
     elif gesture == "2":
         action = "question"
-    cv2.putText(img, action, (300, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), lineType=cv2.LINE_AA)
+    cv2.putText(img, action, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), lineType=cv2.LINE_AA)
     return img

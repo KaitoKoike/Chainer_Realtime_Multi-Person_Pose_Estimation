@@ -19,7 +19,8 @@ if __name__ == '__main__':
     # load model
     hand_detector = HandDetector("handnet", "models/handnet.npz", device=args.gpu)
     pose_detector = PoseDetector("posenet", "models/coco_posenet.npz", device=args.gpu, precise=args.precise)
-    gesture_recognizer =GestureRecognizer(model_path="models/gesture_recog_model.pkl")
+    right_gesture_recognizer = GestureRecognizer(model_path="models/right_gesture_recog_model.pkl")
+    left_gesture_recognizer = GestureRecognizer(model_path="models/left_gesture_recog_model.pkl")
     cap = cv2.VideoCapture(args.cameraId)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -47,17 +48,16 @@ if __name__ == '__main__':
                 bbox = hands["left"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="left")
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
-                hand_gesture_left = gesture_recognizer(hand_keypoints,unit_length)
-                res_img = draw_gesture(res_img,hand_gesture_left,(bbox[0],bbox[1]))
+                hand_gesture_left = left_gesture_recognizer(hand_keypoints, unit_length)
+                res_img = draw_gesture(res_img, hand_gesture_left, (bbox[0], bbox[1]))
 
             if hands["right"] is not None:
                 hand_img = hands["right"]["img"]
                 bbox = hands["right"]["bbox"]
                 hand_keypoints = hand_detector(hand_img, hand_type="right")
                 res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
-                hand_gesture_right = gesture_recognizer(hand_keypoints,unit_length)
+                hand_gesture_right = right_gesture_recognizer(hand_keypoints,unit_length)
                 res_img = draw_gesture(res_img, hand_gesture_right, (bbox[0], bbox[1]))
-
 
         cv2.imshow("result", res_img)
         cv2.waitKey(1)

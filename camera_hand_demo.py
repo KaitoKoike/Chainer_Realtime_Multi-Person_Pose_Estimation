@@ -21,7 +21,7 @@ if __name__ == '__main__':
     pose_detector = PoseDetector("posenet", "models/coco_posenet.npz", device=args.gpu, precise=args.precise)
     right_gesture_recognizer = GestureRecognizer(model_path="models/right_gesture_recog_model.pkl")
     left_gesture_recognizer = GestureRecognizer(model_path="models/left_gesture_recog_model.pkl")
-    cap = cv2.VideoCapture(nvcamerasrc ! video/x-raw(memory:NVMM), width=(int)368, height=(int)368,format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
+    cap = cv2.VideoCapture(nvcamerasrc ! video/x-raw(memory:NVMM), width=(int)640, height=(int)480,format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     print("camera captured")

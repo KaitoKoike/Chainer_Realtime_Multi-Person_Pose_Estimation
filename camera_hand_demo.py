@@ -36,7 +36,9 @@ if __name__ == '__main__':
 
         person_pose_array, _ = pose_detector(img)
         res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)
-        for person_pose in person_pose_array:
+        person_pose_array = sorted(person_pose_array,key=lambda x:x[0])
+        for speaker_id,person_pose in enumerate(person_pose_array):
+            cv2.putText(res_img,str(speaker_id),(person_pose[0]))
             unit_length = pose_detector.get_unit_length(person_pose)
 
             # hands estimation

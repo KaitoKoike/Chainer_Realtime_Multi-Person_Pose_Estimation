@@ -5,9 +5,9 @@ from pose_detector import PoseDetector, draw_person_pose
 from hand_detector import HandDetector, draw_hand_keypoints
 from gesture_recognizer import GestureRecognizer, draw_gesture
 import cupy as cp
-chainer.using_config('enable_backprop', False)
-pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
-cp.cuda.set_allocator(pool.malloc)
+#chainer.using_config('enable_backprop', False)
+#pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
+#cp.cuda.set_allocator(pool.malloc)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='hand detector')
@@ -21,10 +21,10 @@ if __name__ == '__main__':
     pose_detector = PoseDetector("posenet", "models/coco_posenet.npz", device=args.gpu, precise=args.precise)
     right_gesture_recognizer = GestureRecognizer(model_path="models/right_gesture_recog_model.pkl")
     left_gesture_recognizer = GestureRecognizer(model_path="models/left_gesture_recog_model.pkl")
-    cap = cv2.VideoCapture("nvarguscamerasrc ! video/x-raw(memory:NVMM), width=(int)720, height=(int)480,format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv flip-method=2 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
-    #cap = cv2.VideoCapture(1)
-    #cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    #cap = cv2.VideoCapture("nvcamerasrc ! video/x-raw(memory:NVMM), width=(int)640, height=(int)480,format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
+    cap = cv2.VideoCapture(1)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     print("camera captured")
 
     while True:
@@ -60,6 +60,6 @@ if __name__ == '__main__':
                 hand_gesture_right = right_gesture_recognizer(hand_keypoints,unit_length)
                 res_img = draw_gesture(res_img, hand_gesture_right, (bbox[0], bbox[1]))
 
-        cv2.imshow("result", res_img)
+        #cv2.imshow("result", res_img)
         cv2.waitKey(1)
 

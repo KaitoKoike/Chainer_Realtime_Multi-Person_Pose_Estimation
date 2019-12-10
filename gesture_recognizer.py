@@ -12,12 +12,12 @@ class GestureRecognizer(object):
     def __call__(self, hand_keypoint, unit_length):
         if hand_keypoint[0] is not None:
             hand_keypoint = self.preprocessing_two(hand_keypoint, unit_length)
-            print(hand_keypoint)
+            #print(hand_keypoint)
             gesture = self.model.predict([hand_keypoint])
             print(gesture)
             return gesture
         else:
-            print("手が変")
+            print("keypoint is insuffisient")
             return ["0"]
 
     def preprocessing(self, hand_key_point):

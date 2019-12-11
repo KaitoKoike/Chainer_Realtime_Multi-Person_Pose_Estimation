@@ -17,3 +17,4 @@ result.png
 /others/*.csv
 /others/*.mov
 **/*.json
+venv

@@ -8,7 +8,7 @@ import requests
 from pose_detector import PoseDetector, draw_person_pose
 from hand_detector import HandDetector, draw_hand_keypoints
 from gesture_recognizer import GestureRecognizer, draw_gesture, get_student_status
-#import cupy as cp
+import cupy as cp
 #chainer.using_config('enable_backprop', False)
 #pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
 #cp.cuda.set_allocator(pool.malloc)
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     pose_detector = PoseDetector("posenet", "models/coco_posenet.npz", device=args.gpu)
     right_gesture_recognizer = GestureRecognizer(model_path="models/right_gesture_recog_model.pkl")
     left_gesture_recognizer = GestureRecognizer(model_path="models/left_gesture_recog_model.pkl")
-    cap = cv2.VideoCapture("nvarguscamerasrc ! video/x-raw(memory:NVMM), width=(int)720, height=(int)480,format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
+    cap = cv2.VideoCapture("nvarguscamerasrc ! video/x-raw(memory:NVMM), width=(int)640, height=(int)320,format=(string)NV12, framerate=(fraction)10/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
     print("camera captured")
 
     while True:
@@ -71,14 +71,13 @@ if __name__ == '__main__':
                     res_img = draw_gesture(res_img, hand_gesture_right, tuple(map(int,(person_pose[4][0], person_pose[4][1]))))
             print("speaker_id:",speaker_id," は，","右手: ",hand_gesture_right," 左手: ",hand_gesture_left,"です")
             student_status = get_student_status(hand_gesture_left,hand_gesture_right)
-            data = json.dumps({"speaker_id":speaker_id,"student_status":student_status})
             message = """
-            data: {0}
-            """.format(data)
-            query = {"message":message,'topic_name':'printeps/std_msgs/update_student_status'}
+            data: "{{'speaker_id':{0}, 'student_status':{1}}}" 
+            """.format(speaker_id,student_status)
+            query = {"message":message,'topic_name':'/printeps/std_msgs/update_student_status'}
             requests.post("http://yamlab-Surface-Book-2.local:8080/publish",data=query)
         if args.mode == "camera":
             cv2.imshow("result", res_img)
-        time.sleep(0.1)
+        #time.sleep(0.1)
         cv2.waitKey(10)
 

@@ -76,7 +76,7 @@ if __name__ == '__main__':
             data = json.dumps({"speaker_id":speaker_id,"student_status":student_status})
             message = yaml.dump({"data":data})
             query = {"message":message,'topic_name':'printeps/std_msgs/update_student_status'}
-            requests.post("https://yam-lab-SurfaceBook-2.local:8080/publish",data=query)
+            requests.post("http://yamlab-Surface-Book-2.local:8080/publish",data=query)
         if args.mode == "camera":
             cv2.imshow("result", res_img)
         cv2.waitKey(10)

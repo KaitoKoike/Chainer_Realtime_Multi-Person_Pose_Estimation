@@ -16,4 +16,5 @@ result.png
 /others/hand_img/*
 /others/*.csv
 /others/*.mov
+**/*.json
 venv

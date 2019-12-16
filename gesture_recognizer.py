@@ -14,13 +14,12 @@ class GestureRecognizer(object):
             return ["0"]
         elif hand_keypoint[0] is not None:
             hand_keypoint = self.preprocessing_two(hand_keypoint, unit_length)
-            #print(hand_keypoint)
+
             gesture = self.model.predict([hand_keypoint])
-            print(gesture)
-            return gesture
+            return gesture[0]
         else:
-            print("keypoint is insuffisient")
-            return ["0"]
+            print("手が変")
+            return "0"
 
     def preprocessing(self, hand_key_point):
         none_indexes = [i for i, hand_position in enumerate(hand_key_point) if hand_position is None]
@@ -61,3 +60,12 @@ def draw_gesture(img,gesture,left_top):
         action = "question"
     cv2.putText(img, action, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), lineType=cv2.LINE_AA)
     return img
+
+def get_student_status(left_gesture, right_gesture):
+
+    if (right_gesture == "1" and left_gesture == "0") or (right_gesture == "0" and left_gesture=="1"):
+        return "1"
+    elif (right_gesture == "2" and left_gesture == "0") or (right_gesture == "0" and left_gesture == "2"):
+        return "2"
+    else:
+        return "0"

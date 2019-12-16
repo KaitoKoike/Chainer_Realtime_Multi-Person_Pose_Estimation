@@ -72,8 +72,8 @@ if __name__ == '__main__':
             print("speaker_id:",speaker_id," は，","右手: ",hand_gesture_right," 左手: ",hand_gesture_left,"です")
             student_status = get_student_status(hand_gesture_left,hand_gesture_right)
             message = """
-            data: "{{'speaker_id':{0}, 'student_status':{1}}}" 
-            """.format(speaker_id,student_status)
+            data: "{0},{1}" 
+            """.format(speaker_id+1,student_status)
             query = {"message":message,'topic_name':'/printeps/std_msgs/update_student_status'}
             requests.post("http://yamlab-Surface-Book-2.local:8080/publish",data=query)
         if args.mode == "camera":

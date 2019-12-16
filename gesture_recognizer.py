@@ -10,7 +10,9 @@ class GestureRecognizer(object):
         self.model = pickle.load(open(model_path, "rb"))
 
     def __call__(self, hand_keypoint, unit_length):
-        if hand_keypoint[0] is not None:
+        if hand_keypoint is None:
+            return ["0"]
+        elif hand_keypoint[0] is not None:
             hand_keypoint = self.preprocessing_two(hand_keypoint, unit_length)
             #print(hand_keypoint)
             gesture = self.model.predict([hand_keypoint])

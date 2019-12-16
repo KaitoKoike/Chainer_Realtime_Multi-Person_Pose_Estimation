@@ -43,11 +43,17 @@ if __name__ == '__main__':
         if args.mode == "camera":
             res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)
 
-        person_pose_array = sorted(person_pose_array, key=lambda x:x[0][0])
+        discussant_pose_array = []
         for speaker_id,person_pose in enumerate(person_pose_array):
             unit_length = pose_detector.get_unit_length(person_pose)
+            if 15 < unit_length < 1000:
+                discussant_pose_array.append(person_pose)
+        discussant_pose_array = sorted(discussant_pose_array, key=lambda x: x[0][0])
+        for speaker_id,person_pose in enumerate(discussant_pose_array):
+            unit_length = pose_detector.get_unit_length(person_pose)
+            print("speaker_id:",speaker_id,"は，unit_length:",unit_length)
             if args.mode == "camera":
-                print(tuple(person_pose[0][:2]))
+                print("id書き込む座標:",tuple(person_pose[0][:2]))
                 cv2.putText(res_img, str(speaker_id), tuple(map(int,person_pose[0][:2])),cv2.FONT_HERSHEY_SIMPLEX,0.8, (0, 0, 0), lineType=cv2.LINE_AA)
 
             # hands estimation
@@ -71,14 +77,16 @@ if __name__ == '__main__':
                 hand_gesture_right = right_gesture_recognizer(hand_keypoints,unit_length)
                 if args.mode == "camera":
                     res_img = draw_gesture(res_img, hand_gesture_right, tuple(map(int,(person_pose[4][0], person_pose[4][1]))))
-            print("speaker_id:",speaker_id," は，","右手: ",hand_gesture_right," 左手: ",hand_gesture_left,"です")
-            student_status = get_student_status(hand_gesture_left,hand_gesture_right)
-            data = json.dumps({"speaker_id":speaker_id,"student_status":student_status})
+            print("speaker_id:", speaker_id, " は，", "右手: ", hand_gesture_right, " 左手: ", hand_gesture_left, "です")
+            student_status = get_student_status(hand_gesture_left, hand_gesture_right)
             message = """
-            data: {0}
-            """.format(data)
-            query = {"message":message,'topic_name':'printeps/std_msgs/update_student_status'}
-            requests.post("http://yamlab-Surface-Book-2.local:8080/publish",data=query)
+            data: "{0},{1}" 
+            """.format(speaker_id + 1, student_status)
+            query = {"message": message, 'topic_name': '/printeps/std_msgs/update_student_status'}
+            try:
+                requests.post("http://surface01.local:8080/publish", data=query)
+            except Exception as e:
+                print(e)
         if args.mode == "camera":
             cv2.imshow("result", res_img)
         cv2.waitKey(10)

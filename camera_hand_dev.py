@@ -41,8 +41,14 @@ if __name__ == '__main__':
         if args.mode == "camera":
             res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)
 
-        person_pose_array = sorted(person_pose_array, key=lambda x:x[0][0])
-        for speaker_id,person_pose in enumerate(person_pose_array):
+        discussant_pose_array = []
+        for speaker_id, person_pose in enumerate(person_pose_array):
+            unit_length = pose_detector.get_unit_length(person_pose)
+            if 15 < unit_length < 1000:
+                discussant_pose_array.append(person_pose)
+        discussant_pose_array = sorted(discussant_pose_array, key=lambda x: x[0][0])
+
+        for speaker_id, person_pose in enumerate(discussant_pose_array):
             unit_length = pose_detector.get_unit_length(person_pose)
             if args.mode == "camera":
                 print(tuple(person_pose[0][:2]))

@@ -84,7 +84,7 @@ if __name__ == '__main__':
             """.format(speaker_id + 1, student_status)
             query = {"message": message, 'topic_name': '/printeps/std_msgs/update_student_status'}
             try:
-                requests.post("http://surface01.local:8080/publish", data=query)
+                requests.post("http://localhost:8080/publish", data=query)
             except Exception as e:
                 print(e)
         if args.mode == "camera":

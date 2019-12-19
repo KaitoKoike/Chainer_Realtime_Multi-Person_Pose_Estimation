@@ -31,78 +31,81 @@ if __name__ == '__main__':
     while True:
         # get video frame
         ret, img = cap.read()
-        if i % 2 != 0:
-            continue
-        if not ret:
-            print("Failed to capture image")
-            time.sleep(2)
-            continue
-        height = img.shape[0]
-        width = img.shape[1]
-        half_size = (round(width/16),round(height/16))
-        img = cv2.resize(img,half_size)
-        person_pose_array, _ = pose_detector(img)
-        res_img = img[:]
-        if args.mode == "camera":
-            res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)
-
-        discussant_pose_array = []
-        discussant_status_dict = {}
-
-        for speaker_id,person_pose in enumerate(person_pose_array):
-            unit_length = pose_detector.get_unit_length(person_pose)
-            print("speaker_id:", speaker_id, "は，unit_length:", unit_length)
-            if 15 < unit_length < 1000:
-                discussant_pose_array.append(person_pose)
-
-        discussant_pose_array = sorted(discussant_pose_array, key=lambda x: x[0][0])
-
-        for speaker_id,person_pose in enumerate(discussant_pose_array):
-            unit_length = pose_detector.get_unit_length(person_pose)
-            if args.mode == "camera":
-                print("id書き込む座標:",tuple(person_pose[0][:2]))
-                cv2.putText(res_img, str(speaker_id), tuple(map(int,person_pose[0][:2])),cv2.FONT_HERSHEY_SIMPLEX,0.8, (0, 0, 0), lineType=cv2.LINE_AA)
-
-            # hands estimation
-            hands = pose_detector.crop_hands(img, person_pose, unit_length)
-            hand_gesture_right = "0"
-            hand_gesture_left = "0"
-            if hands["left"] is not None:
-                hand_img = hands["left"]["img"]
-                bbox = hands["left"]["bbox"]
-                hand_keypoints = hand_detector(hand_img, hand_type="left")
-                res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
-                hand_gesture_left = left_gesture_recognizer(hand_keypoints, unit_length)
-                if args.mode == "camera":
-                    res_img = draw_gesture(res_img, hand_gesture_left, tuple(map(int,(person_pose[7][0], person_pose[7][1]))))
-
-            if hands["right"] is not None:
-                hand_img = hands["right"]["img"]
-                bbox = hands["right"]["bbox"]
-                hand_keypoints = hand_detector(hand_img, hand_type="right")
-                res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
-                hand_gesture_right = right_gesture_recognizer(hand_keypoints,unit_length)
-                if args.mode == "camera":
-                    res_img = draw_gesture(res_img, hand_gesture_right, tuple(map(int,(person_pose[4][0], person_pose[4][1]))))
-            print("speaker_id:", speaker_id, " は，", "右手: ", hand_gesture_right, " 左手: ", hand_gesture_left, "です")
-            student_status = get_student_status(hand_gesture_left, hand_gesture_right)
-            discussant_status_dict[str(speaker_id)] = "{0},{1}".format(speaker_id+1,student_status)
-
-        message = """
-        data: '{0}' 
-        """.format(json.dumps(discussant_status_dict))
-        query = {"message": message, 'topic_name': '/printeps/std_msgs/update_student_status'}
-        hostname = args.hostname
-        url = "http://"+hostname+".local:8080/publish"
-        print(url)
-        try:
-            requests.post(url, data=query)
-        except Exception as e:
-            print(e)
-        if args.mode == "camera":
-            cv2.imshow("result", res_img)
-        i = i % 2 
         i += 1
+        if i % 2 != 0:
+            pass
+
+        else:
+            if not ret:
+                print("Failed to capture image")
+                time.sleep(2)
+                continue
+            height = img.shape[0]
+            width = img.shape[1]
+            half_size = (round(width/16),round(height/16))
+            img = cv2.resize(img,half_size)
+            person_pose_array, _ = pose_detector(img)
+            res_img = img[:]
+            if args.mode == "camera":
+                res_img = cv2.addWeighted(img, 0.6, draw_person_pose(img, person_pose_array), 0.4, 0)
+
+            discussant_pose_array = []
+            discussant_status_dict = {}
+
+            for speaker_id,person_pose in enumerate(person_pose_array):
+                unit_length = pose_detector.get_unit_length(person_pose)
+                print("speaker_id:", speaker_id, "は，unit_length:", unit_length)
+                if 15 < unit_length < 1000:
+                    discussant_pose_array.append(person_pose)
+
+            discussant_pose_array = sorted(discussant_pose_array, key=lambda x: x[0][0])
+
+            for speaker_id,person_pose in enumerate(discussant_pose_array):
+                unit_length = pose_detector.get_unit_length(person_pose)
+                if args.mode == "camera":
+                    print("id書き込む座標:",tuple(person_pose[0][:2]))
+                    cv2.putText(res_img, str(speaker_id), tuple(map(int,person_pose[0][:2])),cv2.FONT_HERSHEY_SIMPLEX,0.8, (0, 0, 0), lineType=cv2.LINE_AA)
+
+                # hands estimation
+                hands = pose_detector.crop_hands(img, person_pose, unit_length)
+                hand_gesture_right = "0"
+                hand_gesture_left = "0"
+                if hands["left"] is not None:
+                    hand_img = hands["left"]["img"]
+                    bbox = hands["left"]["bbox"]
+                    hand_keypoints = hand_detector(hand_img, hand_type="left")
+                    res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
+                    hand_gesture_left = left_gesture_recognizer(hand_keypoints, unit_length)
+                    if args.mode == "camera":
+                        res_img = draw_gesture(res_img, hand_gesture_left, tuple(map(int,(person_pose[7][0], person_pose[7][1]))))
+
+                if hands["right"] is not None:
+                    hand_img = hands["right"]["img"]
+                    bbox = hands["right"]["bbox"]
+                    hand_keypoints = hand_detector(hand_img, hand_type="right")
+                    res_img = draw_hand_keypoints(res_img, hand_keypoints, (bbox[0], bbox[1]))
+                    hand_gesture_right = right_gesture_recognizer(hand_keypoints,unit_length)
+                    if args.mode == "camera":
+                        res_img = draw_gesture(res_img, hand_gesture_right, tuple(map(int,(person_pose[4][0], person_pose[4][1]))))
+                print("speaker_id:", speaker_id, " は，", "右手: ", hand_gesture_right, " 左手: ", hand_gesture_left, "です")
+                student_status = get_student_status(hand_gesture_left, hand_gesture_right)
+                discussant_status_dict[str(speaker_id)] = "{0},{1}".format(speaker_id+1,student_status)
+
+            message = """
+            data: '{0}' 
+            """.format(json.dumps(discussant_status_dict))
+            query = {"message": message, 'topic_name': '/printeps/std_msgs/update_student_status'}
+            hostname = args.hostname
+            url = "http://"+hostname+".local:8080/publish"
+            print(url)
+            try:
+                requests.post(url, data=query)
+            except Exception as e:
+                print(e)
+            if args.mode == "camera":
+                cv2.imshow("result", res_img)
+
+        i = i % 2
         time.sleep(10)
         cv2.waitKey(10)
 

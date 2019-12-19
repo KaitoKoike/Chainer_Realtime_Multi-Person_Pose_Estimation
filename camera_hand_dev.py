@@ -9,9 +9,9 @@ from pose_detector import PoseDetector, draw_person_pose
 from hand_detector import HandDetector, draw_hand_keypoints
 from gesture_recognizer import GestureRecognizer, draw_gesture, get_student_status
 import cupy as cp
-#chainer.using_config('enable_backprop', False)
-#pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
-#cp.cuda.set_allocator(pool.malloc)
+chainer.using_config('enable_backprop', False)
+pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
+cp.cuda.set_allocator(pool.malloc)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='hand detector')
@@ -30,10 +30,11 @@ if __name__ == '__main__':
     i = 0
     while True:
         # get video frame
-        print("image read start")
         ret, img = cap.read()
         i += 1
         if i % 2 != 0:
+            print("pass")
+            i = i % 2
             pass
 
         else:
@@ -41,9 +42,10 @@ if __name__ == '__main__':
                 print("Failed to capture image")
                 time.sleep(2)
                 continue
+            print("start image read")
             height = img.shape[0]
             width = img.shape[1]
-            half_size = (round(width/8),round(height/8))
+            half_size = (round(width/10),round(height/10))
             img = cv2.resize(img,half_size)
             person_pose_array, _ = pose_detector(img)
             res_img = img[:]
@@ -60,7 +62,7 @@ if __name__ == '__main__':
                     discussant_pose_array.append(person_pose)
 
             discussant_pose_array = sorted(discussant_pose_array, key=lambda x: x[0][0])
-
+            post_flag = False
             for speaker_id,person_pose in enumerate(discussant_pose_array):
                 unit_length = pose_detector.get_unit_length(person_pose)
                 if args.mode == "camera":
@@ -88,10 +90,12 @@ if __name__ == '__main__':
                     hand_gesture_right = right_gesture_recognizer(hand_keypoints,unit_length)
                     if args.mode == "camera":
                         res_img = draw_gesture(res_img, hand_gesture_right, tuple(map(int,(person_pose[4][0], person_pose[4][1]))))
-                print("speaker_id:", speaker_id, " は，", "右手: ", hand_gesture_right, " 左手: ", hand_gesture_left, "です")
+                # print("speaker_id:", speaker_id, " は，", "右手: ", hand_gesture_right, " 左手: ", hand_gesture_left, "です")
                 student_status = get_student_status(hand_gesture_left, hand_gesture_right)
-                discussant_status_dict[str(speaker_id)] = "{0},{1}".format(speaker_id+1,student_status)
-
+                discussant_status_dict[str(speaker_id+1)] = "{0}".format(student_status)
+                if student_status != "0":
+                    post_flag = True
+                
             message = """
             data: '{0}' 
             """.format(json.dumps(discussant_status_dict))
@@ -100,14 +104,15 @@ if __name__ == '__main__':
             url = "http://"+hostname+".local:8080/publish"
 
             try:
-                requests.post(url, data=query)
+                if post_flag :
+                    requests.post(url, data=query)
             except Exception as e:
                 print(e)
             if args.mode == "camera":
                 cv2.imshow("result", res_img)
-        print("終了")
+            print("終了")
         i = i % 2
-        time.sleep(0.1)
+        time.sleep(0.2)
         cv2.waitKey(10)
 
 

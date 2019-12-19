@@ -30,6 +30,7 @@ if __name__ == '__main__':
     i = 0
     while True:
         # get video frame
+        print("image read start")
         ret, img = cap.read()
         i += 1
         if i % 2 != 0:
@@ -97,14 +98,14 @@ if __name__ == '__main__':
             query = {"message": message, 'topic_name': '/printeps/std_msgs/update_student_status'}
             hostname = args.hostname
             url = "http://"+hostname+".local:8080/publish"
-            print(url)
+
             try:
                 requests.post(url, data=query)
             except Exception as e:
                 print(e)
             if args.mode == "camera":
                 cv2.imshow("result", res_img)
-
+        print("終了")
         i = i % 2
         time.sleep(10)
         cv2.waitKey(10)

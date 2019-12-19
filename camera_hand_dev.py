@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='hand detector')
     parser.add_argument('--gpu', '-g', type=int, default=-1, help='GPU ID (negative value indicates CPU)')
     parser.add_argument("--mode", "-m", type=str, default="camera", help="select whether you watch a result or not ")
-    parser.add_argument("--cameraId", "-c", type=int, default=0,help="select an id of camera you will use")
+    parser.add_argument("--hostname","-hn",type=str,default="surface01",help="hostname of discussion PC")
     args = parser.parse_args()
 
     # load model
@@ -90,8 +90,10 @@ if __name__ == '__main__':
         data: "{0}" 
         """.format(json.dumps(discussant_status_dict))
         query = {"message": message, 'topic_name': '/printeps/std_msgs/update_student_status'}
+        hostname = args.hostname
+        url = "http://"+hostname+".local:8080/publish"
         try:
-            requests.post("http://localhost:8080/publish", data=query)
+            requests.post(url, data=query)
         except Exception as e:
             print(e)
         if args.mode == "camera":

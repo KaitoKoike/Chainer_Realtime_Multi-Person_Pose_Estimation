@@ -42,7 +42,7 @@ if __name__ == '__main__':
                 continue
             height = img.shape[0]
             width = img.shape[1]
-            half_size = (round(width/16),round(height/16))
+            half_size = (round(width/8),round(height/8))
             img = cv2.resize(img,half_size)
             person_pose_array, _ = pose_detector(img)
             res_img = img[:]
@@ -106,7 +106,7 @@ if __name__ == '__main__':
                 cv2.imshow("result", res_img)
 
         i = i % 2
-        time.sleep(10)
+        time.sleep(0.1)
         cv2.waitKey(10)
 
 
